@@ -8,7 +8,6 @@ package ia;
 import java.sql.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.TableModel;
 
 /**
  *
@@ -26,11 +25,9 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
     
     @Override
     public void tableChanged(TableModelEvent e){
-        TableModel model = (TableModel)e.getSource();
         int r = e.getFirstRow();
         int c = e.getColumn();
         IA.updateExps(expensesTable.getValueAt(r, 0), expensesTable.getValueAt(r, 1), expensesTable.getValueAt(r, 2), expensesTable.getValueAt(r, 3), expensesTable.getValueAt(r, 4), c);
-        System.out.println(r + " " + c);
     }
 
     public void updateTable() {

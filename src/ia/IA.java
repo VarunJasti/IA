@@ -15,14 +15,25 @@ public class IA {
         base.setVisible(true);
     }
 
+    public static void deleteTrip(Object name, Object sDate, Object eDate) {
+        try {
+            if (name instanceof String && sDate instanceof String && eDate instanceof String) {
+                Statement stmt = con.createStatement();
+                stmt.executeUpdate("delete from " + base.getUser() + "_trips where trip_name = '" + name + "' and strt_date = '" + sDate + "' and end_date = '" + eDate + "';");
+            }
+        } catch (Exception e) {
+            System.out.println("error");
+        }
+    }
+
     public static void updateTrips(Object name, Object sDate, Object eDate, int column) {
         if (name instanceof String && sDate instanceof String && eDate instanceof String) {
             if (column == 0) {
-                updateTripName((String)name, (String)sDate, (String)eDate);
+                updateTripName((String) name, (String) sDate, (String) eDate);
             } else if (column == 1) {
-                updateTripSDate((String)name, (String)sDate, (String)eDate);
+                updateTripSDate((String) name, (String) sDate, (String) eDate);
             } else if (column == 2) {
-                updateTripEDate((String)name, (String)sDate, (String)eDate);
+                updateTripEDate((String) name, (String) sDate, (String) eDate);
             }
         }
     }

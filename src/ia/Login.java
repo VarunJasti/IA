@@ -1,7 +1,5 @@
 package ia;
 
-//this worked
-
 import javax.swing.*;
 
 /**
