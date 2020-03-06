@@ -23,6 +23,7 @@ public class IA {
             }
         } catch (Exception e) {
             System.out.println("error");
+            e.printStackTrace();
         }
     }
 

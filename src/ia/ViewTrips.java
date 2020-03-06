@@ -26,15 +26,22 @@ public class ViewTrips extends javax.swing.JPanel implements TableModelListener 
 
     @Override
     public void tableChanged(TableModelEvent e) {
-        int r = e.getFirstRow();
-        int c = e.getColumn();
-        IA.updateTrips(tripTable.getValueAt(r, 0), tripTable.getValueAt(r, 1), tripTable.getValueAt(r, 2), c);
+        if (e.getType() == TableModelEvent.UPDATE) {
+            int r = e.getFirstRow();
+            int c = e.getColumn();
+            IA.updateTrips(tripTable.getValueAt(r, 0), tripTable.getValueAt(r, 1), tripTable.getValueAt(r, 2), c);
+        }
     }
 
     public void updateTable() {
         ResultSet rs = IA.getTrips(IA.base.getUser());
         try {
             rs.next();
+            for (int i = 0; i < tripTable.getRowCount(); i++) {
+                tripTable.setValueAt("", i, 0);
+                tripTable.setValueAt("", i, 1);
+                tripTable.setValueAt("", i, 2);
+            }
             for (int i = 0; i < tripTable.getRowCount(); i++) {
                 tripTable.setValueAt(rs.getString("trip_name"), i, 0);
                 tripTable.setValueAt(rs.getString("strt_date"), i, 1);
@@ -157,9 +164,9 @@ public class ViewTrips extends javax.swing.JPanel implements TableModelListener 
     private void delRowButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_delRowButtonActionPerformed
         int[] rows = tripTable.getSelectedRows();
         for (int i = 0; i < rows.length; i++) {
-            IA.deleteTrip(tripTable.getValueAt(i, 0), tripTable.getValueAt(i, 1), tripTable.getValueAt(i, 2));
+            IA.deleteTrip(tripTable.getValueAt(rows[i], 0), tripTable.getValueAt(rows[i], 1), tripTable.getValueAt(rows[i], 2));
         }
-        updateTable();
+        //updateTable();
     }//GEN-LAST:event_delRowButtonActionPerformed
 
 
