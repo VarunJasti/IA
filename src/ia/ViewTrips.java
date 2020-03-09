@@ -34,6 +34,7 @@ public class ViewTrips extends javax.swing.JPanel implements TableModelListener 
     }
 
     public void updateTable() {
+        tripTable.getModel().removeTableModelListener(this);
         ResultSet rs = IA.getTrips(IA.base.getUser());
         try {
             rs.next();
@@ -51,6 +52,7 @@ public class ViewTrips extends javax.swing.JPanel implements TableModelListener 
         } catch (Exception e) {
             System.out.println("error");
         }
+        tripTable.getModel().addTableModelListener(this);
     }
 
     /**
@@ -127,24 +129,26 @@ public class ViewTrips extends javax.swing.JPanel implements TableModelListener 
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(213, 213, 213)
-                .addComponent(jLabel1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(addTripsButton)
-                .addGap(65, 65, 65))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(173, 173, 173)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(delRowButton)
-                .addGap(0, 39, Short.MAX_VALUE))
+                .addGap(39, 39, 39)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(40, 40, 40)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 523, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(512, 512, 512)
+                        .addComponent(addTripsButton)
+                        .addGap(26, 26, 26))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(delRowButton)))
+                .addContainerGap(173, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(52, 52, 52)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(34, 34, 34)
                 .addComponent(jLabel1)
                 .addGap(38, 38, 38)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -153,7 +157,7 @@ public class ViewTrips extends javax.swing.JPanel implements TableModelListener 
                         .addGap(18, 18, 18)
                         .addComponent(addTripsButton))
                     .addComponent(delRowButton))
-                .addContainerGap(30, Short.MAX_VALUE))
+                .addContainerGap(48, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -162,11 +166,13 @@ public class ViewTrips extends javax.swing.JPanel implements TableModelListener 
     }//GEN-LAST:event_addTripsButtonActionPerformed
 
     private void delRowButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_delRowButtonActionPerformed
+        tripTable.getModel().removeTableModelListener(this);
         int[] rows = tripTable.getSelectedRows();
         for (int i = 0; i < rows.length; i++) {
             IA.deleteTrip(tripTable.getValueAt(rows[i], 0), tripTable.getValueAt(rows[i], 1), tripTable.getValueAt(rows[i], 2));
         }
-        //updateTable();
+        tripTable.getModel().addTableModelListener(this);
+        updateTable();
     }//GEN-LAST:event_delRowButtonActionPerformed
 
 

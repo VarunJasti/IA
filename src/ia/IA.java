@@ -15,6 +15,17 @@ public class IA {
         base.setVisible(true);
     }
 
+    public static void deleteExp(Object trip, Object amount, Object type, Object curr, Object date) {
+        try {
+            if (trip instanceof String && amount instanceof String && type instanceof String && curr instanceof String && date instanceof String) {
+                Statement stmt = con.createStatement();
+                stmt.executeUpdate("delete from " + base.getUser() + "_expenses where trip = '" + trip + "' and amount = " + amount + " and expenseType = '" + type + "' and currency = '" + curr + "' and dates = '" + date + "';");
+            }
+        } catch (Exception e) {
+            System.out.println("error");
+        }
+    }
+
     public static void deleteTrip(Object name, Object sDate, Object eDate) {
         try {
             if (name instanceof String && sDate instanceof String && eDate instanceof String) {

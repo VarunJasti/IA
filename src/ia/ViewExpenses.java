@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ia;
 
 import java.sql.*;
@@ -28,9 +23,11 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
         int r = e.getFirstRow();
         int c = e.getColumn();
         IA.updateExps(expensesTable.getValueAt(r, 0), expensesTable.getValueAt(r, 1), expensesTable.getValueAt(r, 2), expensesTable.getValueAt(r, 3), expensesTable.getValueAt(r, 4), c);
+        System.out.println(r + " " + c);
     }
 
     public void updateTable() {
+        expensesTable.getModel().removeTableModelListener(this);
         ResultSet rs = IA.getExps(IA.base.getUser());
         try {
             for (int i = 0; i < expensesTable.getRowCount(); i++) {
@@ -44,6 +41,7 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
         } catch (Exception e) {
             System.out.println("error");
         }
+        expensesTable.getModel().addTableModelListener(this);
     }
 
     /**
@@ -59,6 +57,7 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
         expensesTable = new javax.swing.JTable();
         expensesLabel = new javax.swing.JLabel();
         addExpButton = new javax.swing.JButton();
+        delExpButton = new javax.swing.JButton();
 
         expensesTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -109,34 +108,45 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
             }
         });
 
+        delExpButton.setText("Delete Selected Row(s)");
+        delExpButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                delExpButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(addExpButton)
-                .addGap(40, 40, 40))
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(170, 170, 170)
+                        .addContainerGap(556, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(addExpButton))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(77, 77, 77)
                         .addComponent(expensesLabel))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(103, 103, 103)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 620, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(77, Short.MAX_VALUE))
+                        .addContainerGap()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 599, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(delExpButton)))
+                .addContainerGap(64, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(33, 33, 33)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(37, 37, 37)
                 .addComponent(expensesLabel)
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(27, 27, 27)
-                .addComponent(addExpButton)
-                .addContainerGap(53, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(27, 27, 27)
+                        .addComponent(addExpButton))
+                    .addComponent(delExpButton))
+                .addContainerGap(49, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -144,9 +154,20 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
         IA.base.showPanel(3);
     }//GEN-LAST:event_addExpButtonActionPerformed
 
+    private void delExpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_delExpButtonActionPerformed
+        expensesTable.getModel().removeTableModelListener(this);
+        int[] rows = expensesTable.getSelectedRows();
+        for (int i = 0; i < rows.length; i++) {
+            IA.deleteExp(expensesTable.getValueAt(rows[i], 0), expensesTable.getValueAt(rows[i], 1), expensesTable.getValueAt(rows[i], 2), expensesTable.getValueAt(rows[i], 3), expensesTable.getValueAt(rows[i], 4));
+        }
+        updateTable();
+        expensesTable.getModel().addTableModelListener(this);
+    }//GEN-LAST:event_delExpButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addExpButton;
+    private javax.swing.JButton delExpButton;
     private javax.swing.JLabel expensesLabel;
     private javax.swing.JTable expensesTable;
     private javax.swing.JScrollPane jScrollPane1;
