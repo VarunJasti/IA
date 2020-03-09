@@ -3,7 +3,6 @@ package ia;
 import java.sql.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-
 /**
  *
  * @author jastvar21
@@ -16,6 +15,12 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
     public ViewExpenses() {
         initComponents();
         expensesTable.getModel().addTableModelListener(this);
+        expensesTable.getColumnModel().getColumn(1).setPreferredWidth(15);
+        expensesTable.getColumnModel().getColumn(3).setPreferredWidth(15);
+        orderDrop.removeAllItems();
+        orderDrop.addItem("Ascending");
+        orderDrop.addItem("Descending");
+        orderDrop.setSelectedIndex(-1);
     }
     
     @Override
@@ -23,11 +28,16 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
         int r = e.getFirstRow();
         int c = e.getColumn();
         IA.updateExps(expensesTable.getValueAt(r, 0), expensesTable.getValueAt(r, 1), expensesTable.getValueAt(r, 2), expensesTable.getValueAt(r, 3), expensesTable.getValueAt(r, 4), c);
-        System.out.println(r + " " + c);
+        System.out.println("changed");
     }
 
     public void updateTable() {
         expensesTable.getModel().removeTableModelListener(this);
+        for (int i = 0; i < expensesTable.getRowCount(); i++) {
+            for (int j = 0; j < expensesTable.getColumnCount(); j++) {
+                expensesTable.setValueAt("", i, j);
+            }
+        }
         ResultSet rs = IA.getExps(IA.base.getUser());
         try {
             for (int i = 0; i < expensesTable.getRowCount(); i++) {
@@ -42,6 +52,27 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
             System.out.println("error");
         }
         expensesTable.getModel().addTableModelListener(this);
+    }
+    
+    public void sortTable (ResultSet rs) {
+        expensesTable.getModel().removeTableModelListener(this);
+        for (int i = 0; i < expensesTable.getRowCount(); i++) {
+            for (int j = 0; j < expensesTable.getColumnCount(); j++) {
+                expensesTable.setValueAt("", i, j);
+            }
+        }
+        try {
+            for (int i = 0; i < expensesTable.getRowCount(); i++) {
+                rs.next();
+                expensesTable.setValueAt(rs.getString("trip"), i, 0);
+                expensesTable.setValueAt(rs.getString("amount"), i, 1);
+                expensesTable.setValueAt(rs.getString("expenseType"), i, 2);
+                expensesTable.setValueAt(rs.getString("currency"), i, 3);
+                expensesTable.setValueAt(rs.getString("dates"), i, 4);
+            }
+        }catch (Exception e) {
+            System.out.println("error");
+        }
     }
 
     /**
@@ -58,6 +89,13 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
         expensesLabel = new javax.swing.JLabel();
         addExpButton = new javax.swing.JButton();
         delExpButton = new javax.swing.JButton();
+        sortLabel = new javax.swing.JLabel();
+        orderDrop = new javax.swing.JComboBox();
+        tripButton = new javax.swing.JButton();
+        amtButton = new javax.swing.JButton();
+        typeButton = new javax.swing.JButton();
+        currButton = new javax.swing.JButton();
+        dateButton = new javax.swing.JButton();
 
         expensesTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -115,6 +153,30 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
             }
         });
 
+        sortLabel.setText("Sort:");
+
+        orderDrop.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        tripButton.setText("Trip");
+        tripButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tripButtonActionPerformed(evt);
+            }
+        });
+
+        amtButton.setText("Amount");
+        amtButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                amtButtonActionPerformed(evt);
+            }
+        });
+
+        typeButton.setText("Type");
+
+        currButton.setText("Currency");
+
+        dateButton.setText("Date");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -131,7 +193,15 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
                         .addContainerGap()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 599, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(delExpButton)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(delExpButton)
+                            .addComponent(sortLabel)
+                            .addComponent(orderDrop, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tripButton)
+                            .addComponent(amtButton)
+                            .addComponent(typeButton)
+                            .addComponent(currButton)
+                            .addComponent(dateButton))))
                 .addContainerGap(64, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -145,7 +215,22 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(27, 27, 27)
                         .addComponent(addExpButton))
-                    .addComponent(delExpButton))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(delExpButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(sortLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(orderDrop, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tripButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(amtButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(typeButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(currButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(dateButton)))
                 .addContainerGap(49, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -160,16 +245,39 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
         for (int i = 0; i < rows.length; i++) {
             IA.deleteExp(expensesTable.getValueAt(rows[i], 0), expensesTable.getValueAt(rows[i], 1), expensesTable.getValueAt(rows[i], 2), expensesTable.getValueAt(rows[i], 3), expensesTable.getValueAt(rows[i], 4));
         }
-        updateTable();
         expensesTable.getModel().addTableModelListener(this);
+        updateTable();
     }//GEN-LAST:event_delExpButtonActionPerformed
+
+    private void tripButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tripButtonActionPerformed
+        if (orderDrop.getSelectedIndex() == 0) {
+            sortTable(IA.sortExps("trip", "asc"));
+        } else if (orderDrop.getSelectedIndex() == 1) {
+            sortTable(IA.sortExps("trip", "desc"));
+        }
+    }//GEN-LAST:event_tripButtonActionPerformed
+
+    private void amtButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_amtButtonActionPerformed
+        if (orderDrop.getSelectedIndex() == 0) {
+            sortTable(IA.sortExps("amount", "asc"));
+        } else if (orderDrop.getSelectedIndex() == 1) {
+            sortTable(IA.sortExps("amount", "desc"));
+        }
+    }//GEN-LAST:event_amtButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addExpButton;
+    private javax.swing.JButton amtButton;
+    private javax.swing.JButton currButton;
+    private javax.swing.JButton dateButton;
     private javax.swing.JButton delExpButton;
     private javax.swing.JLabel expensesLabel;
     private javax.swing.JTable expensesTable;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JComboBox orderDrop;
+    private javax.swing.JLabel sortLabel;
+    private javax.swing.JButton tripButton;
+    private javax.swing.JButton typeButton;
     // End of variables declaration//GEN-END:variables
 }

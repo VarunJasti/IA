@@ -14,6 +14,18 @@ public class IA {
         base = new Base();
         base.setVisible(true);
     }
+    
+    public static ResultSet sortExps(String type, String order)
+    {
+        try {
+            Statement stmt = con.createStatement();
+            stmt.execute("select top 15 * from " + base.getUser() + "_expenses order by " + type + " " + order + ";");
+            return stmt.getResultSet();
+        } catch (Exception e) {
+            System.out.println("error");
+        }
+        return null;
+    }
 
     public static void deleteExp(Object trip, Object amount, Object type, Object curr, Object date) {
         try {
