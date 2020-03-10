@@ -1,5 +1,6 @@
 package ia;
 
+import java.io.FileInputStream;
 import java.sql.*;
 import javax.swing.*;
 
@@ -172,7 +173,7 @@ public class IA {
         }
     }
 
-    public static boolean addExpense(Object trip, Object type, Object curr, String amt, String date) {
+    public static boolean addExpense(Object trip, Object type, Object curr, String amt, String date, FileInputStream fis, int len) {
         for (int i = 0; i < amt.length(); i++) {
             if (!((amt.charAt(i) > 47 && amt.charAt(i) < 58) || amt.charAt(i) == 46)) {
                 JDialog invalid = new InvalidInput(base, true);
@@ -182,11 +183,20 @@ public class IA {
         }
         if ((trip instanceof String && type instanceof String && curr instanceof String)) {
             try {
-                Statement stmt = con.createStatement();
-                stmt.executeUpdate("insert into " + base.getUser() + "_expenses(trip, amount, expenseType, currency, dates) values('" + trip + "', " + amt + ", '" + type + "', '" + curr + "', '" + date + "');");
+                PreparedStatement pstmt = con.prepareStatement("insert into " + base.getUser() + "_expenses(trip, amount, expenseType, currency, dates, images) values('" + trip + "', " + amt + ", '" + type + "', '" + curr + "', '" + date + "', ?)");
+                /*pstmt.setString(1, (String)trip);
+                pstmt.setString(2, (String)type);
+                pstmt.setString(3, (String)curr);
+                pstmt.setDouble(a, amt);
+                pstmt.setString(5, (String)date);*/
+                pstmt.setBinaryStream(1, fis, len);
+                pstmt.executeUpdate();
+                //Statement stmt = con.createStatement();
+                //stmt.executeUpdate("insert into " + base.getUser() + "_expenses(trip, amount, expenseType, currency, dates, images) values('" + trip + "', " + amt + ", '" + type + "', '" + curr + "', '" + date + "',);");
                 return true;
             } catch (Exception e) {
                 System.out.println("error");
+                e.printStackTrace();
             }
         } else {
             JDialog invalid = new InvalidInput(base, true);
@@ -210,7 +220,7 @@ public class IA {
         try {
             Statement stmt = con.createStatement();
             stmt.executeUpdate("insert into users(username, pass, first_name, last_name) values ('" + user + "', '" + pass + "', '" + firstName + "', '" + lastName + "');");
-            stmt.executeUpdate("create table " + user + "_expenses (trip varchar(30), amount decimal(18, 2), expenseType varchar(30), currency varchar(5), dates date);");
+            stmt.executeUpdate("create table " + user + "_expenses (trip varchar(30), amount decimal(18, 2), expenseType varchar(30), currency varchar(5), dates date, images varbinary(MAX));");
             stmt.executeUpdate("create table " + user + "_trips (trip_name varchar(30), strt_date date, end_date date);");
             IA.base.showPanel(2);
         } catch (Exception e) {

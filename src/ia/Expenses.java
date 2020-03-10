@@ -5,14 +5,19 @@
  */
 package ia;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.sql.*;
 import javax.swing.*;
+import javax.swing.filechooser.FileSystemView;
 
 /**
  *
  * @author Varun Jasti
  */
 public class Expenses extends javax.swing.JPanel {
+
+    private static File SF;
 
     /**
      * Creates new form Expenses
@@ -35,7 +40,7 @@ public class Expenses extends javax.swing.JPanel {
         currDrop.addItem("Other");
         typeDrop.setSelectedIndex(-1);
         currDrop.setSelectedIndex(-1);
-        setDrops(month, 1,  12);
+        setDrops(month, 1, 12);
         setDrops(day, 1, 31);
         setDrops(year, 2020, 2030);
     }
@@ -63,12 +68,16 @@ public class Expenses extends javax.swing.JPanel {
     }
 
     public void expense() {
-        //String date = 
-        if (IA.addExpense(tripDrop.getSelectedItem(), typeDrop.getSelectedItem(), currDrop.getSelectedItem(), amountField.getText(), year.getSelectedItem() + "-" + month.getSelectedItem() + "-" + day.getSelectedItem())) {
-            amountField.setText("");
-            tripDrop.setSelectedIndex(-1);
-            typeDrop.setSelectedIndex(-1);
-            currDrop.setSelectedIndex(-1);
+        try {
+            FileInputStream fis = new FileInputStream(SF);
+            if (IA.addExpense(tripDrop.getSelectedItem(), typeDrop.getSelectedItem(), currDrop.getSelectedItem(), amountField.getText(), year.getSelectedItem() + "-" + month.getSelectedItem() + "-" + day.getSelectedItem(), fis, (int)SF.length())) {
+                amountField.setText("");
+                tripDrop.setSelectedIndex(-1);
+                typeDrop.setSelectedIndex(-1);
+                currDrop.setSelectedIndex(-1);
+            }
+        } catch (Exception e) {
+            System.out.println("error");
         }
     }
 
@@ -98,6 +107,8 @@ public class Expenses extends javax.swing.JPanel {
         jLabel5 = new javax.swing.JLabel();
         dateLabel = new javax.swing.JLabel();
         year = new javax.swing.JComboBox();
+        selFileButton = new javax.swing.JButton();
+        imgLabel = new javax.swing.JLabel();
 
         tripLabe.setText("Trip");
 
@@ -152,6 +163,15 @@ public class Expenses extends javax.swing.JPanel {
 
         year.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
+        selFileButton.setText("Select File");
+        selFileButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                selFileButtonActionPerformed(evt);
+            }
+        });
+
+        imgLabel.setText("Receipt Image");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -183,7 +203,6 @@ public class Expenses extends javax.swing.JPanel {
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(18, 18, 18)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(dateLabel)
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(month, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -193,10 +212,16 @@ public class Expenses extends javax.swing.JPanel {
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(jLabel5)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(year, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(21, 21, 21)
+                                        .addComponent(year, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(dateLabel))
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(imgLabel)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(selFileButton)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                         .addComponent(subButton)))))))
-                .addContainerGap(242, Short.MAX_VALUE))
+                .addGap(67, 154, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -207,7 +232,8 @@ public class Expenses extends javax.swing.JPanel {
                     .addComponent(jLabel1)
                     .addComponent(currLabel)
                     .addComponent(amountLabel)
-                    .addComponent(dateLabel))
+                    .addComponent(dateLabel)
+                    .addComponent(imgLabel))
                 .addGap(26, 26, 26)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(tripDrop, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -219,7 +245,8 @@ public class Expenses extends javax.swing.JPanel {
                     .addComponent(day, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5)
                     .addComponent(subButton)
-                    .addComponent(year, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(year, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(selFileButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 197, Short.MAX_VALUE)
                 .addComponent(tripButton)
                 .addGap(18, 18, 18)
@@ -244,6 +271,16 @@ public class Expenses extends javax.swing.JPanel {
         IA.base.showPanel(5);
     }//GEN-LAST:event_viewButtonActionPerformed
 
+    private void selFileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selFileButtonActionPerformed
+        JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+        int returnValue = jfc.showOpenDialog(null);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            SF = jfc.getSelectedFile();
+            selFileButton.setText(SF.getName());
+            System.out.println(SF.getAbsolutePath());
+        }
+    }//GEN-LAST:event_selFileButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField amountField;
@@ -252,10 +289,12 @@ public class Expenses extends javax.swing.JPanel {
     private javax.swing.JLabel currLabel;
     private javax.swing.JLabel dateLabel;
     private javax.swing.JComboBox<String> day;
+    private javax.swing.JLabel imgLabel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JComboBox<String> month;
+    private javax.swing.JButton selFileButton;
     private javax.swing.JButton subButton;
     private javax.swing.JButton tripButton;
     private javax.swing.JComboBox<String> tripDrop;

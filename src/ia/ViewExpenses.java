@@ -3,6 +3,10 @@ package ia;
 import java.sql.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import java.io.File;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileSystemView;
+
 /**
  *
  * @author jastvar21
@@ -22,9 +26,9 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
         orderDrop.addItem("Descending");
         orderDrop.setSelectedIndex(-1);
     }
-    
+
     @Override
-    public void tableChanged(TableModelEvent e){
+    public void tableChanged(TableModelEvent e) {
         int r = e.getFirstRow();
         int c = e.getColumn();
         IA.updateExps(expensesTable.getValueAt(r, 0), expensesTable.getValueAt(r, 1), expensesTable.getValueAt(r, 2), expensesTable.getValueAt(r, 3), expensesTable.getValueAt(r, 4), c);
@@ -52,8 +56,8 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
         }
         expensesTable.getModel().addTableModelListener(this);
     }
-    
-    public void sortTable (ResultSet rs) {
+
+    public void sortTable(ResultSet rs) {
         expensesTable.getModel().removeTableModelListener(this);
         for (int i = 0; i < expensesTable.getRowCount(); i++) {
             for (int j = 0; j < expensesTable.getColumnCount(); j++) {
@@ -69,7 +73,7 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
                 expensesTable.setValueAt(rs.getString("currency"), i, 3);
                 expensesTable.setValueAt(rs.getString("dates"), i, 4);
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("error");
         }
         expensesTable.getModel().addTableModelListener(this);
