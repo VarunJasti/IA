@@ -15,6 +15,17 @@ public class IA {
         base.setVisible(true);
     }
     
+    public static ResultSet sortTrips (String type, String order) {
+        try {
+            Statement stmt = con.createStatement();
+            stmt.execute("select top 15 * from " + base.getUser() + "_trips order by " + type + " " + order + ";");
+            return stmt.getResultSet();
+        } catch (Exception e) {
+            System.out.println("error");
+        }
+        return null;
+    }
+    
     public static ResultSet sortExps(String type, String order)
     {
         try {

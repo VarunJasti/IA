@@ -213,16 +213,25 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Type"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="typeButtonActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="currButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Currency"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="currButtonActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="dateButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Date"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dateButtonActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

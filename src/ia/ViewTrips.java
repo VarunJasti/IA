@@ -22,6 +22,10 @@ public class ViewTrips extends javax.swing.JPanel implements TableModelListener 
     public ViewTrips() {
         initComponents();
         tripTable.getModel().addTableModelListener(this);
+        orderDrop.removeAllItems();
+        orderDrop.addItem("Ascending");
+        orderDrop.addItem("Descending");
+        orderDrop.setSelectedIndex(-1);
     }
 
     @Override
@@ -36,13 +40,34 @@ public class ViewTrips extends javax.swing.JPanel implements TableModelListener 
     public void updateTable() {
         tripTable.getModel().removeTableModelListener(this);
         ResultSet rs = IA.getTrips(IA.base.getUser());
+        for (int i = 0; i < tripTable.getRowCount(); i++) {
+            for (int j = 0; j < tripTable.getColumnCount(); j++) {
+                tripTable.setValueAt("", i, j);
+            }
+        }
         try {
             rs.next();
             for (int i = 0; i < tripTable.getRowCount(); i++) {
-                tripTable.setValueAt("", i, 0);
-                tripTable.setValueAt("", i, 1);
-                tripTable.setValueAt("", i, 2);
+                tripTable.setValueAt(rs.getString("trip_name"), i, 0);
+                tripTable.setValueAt(rs.getString("strt_date"), i, 1);
+                tripTable.setValueAt(rs.getString("end_date"), i, 2);
+                rs.next();
             }
+        } catch (Exception e) {
+            System.out.println("error");
+        }
+        tripTable.getModel().addTableModelListener(this);
+    }
+    
+    public void sortTable(ResultSet rs) {
+        tripTable.getModel().removeTableModelListener(this);
+        for (int i = 0; i < tripTable.getRowCount(); i++) {
+            for (int j = 0; j < tripTable.getColumnCount(); j++) {
+                tripTable.setValueAt("", i, j);
+            }
+        }
+        try {
+            rs.next();
             for (int i = 0; i < tripTable.getRowCount(); i++) {
                 tripTable.setValueAt(rs.getString("trip_name"), i, 0);
                 tripTable.setValueAt(rs.getString("strt_date"), i, 1);
@@ -69,6 +94,11 @@ public class ViewTrips extends javax.swing.JPanel implements TableModelListener 
         jLabel1 = new javax.swing.JLabel();
         addTripsButton = new javax.swing.JButton();
         delRowButton = new javax.swing.JButton();
+        sortLabel = new javax.swing.JLabel();
+        orderDrop = new javax.swing.JComboBox<>();
+        tripButton = new javax.swing.JButton();
+        sDateButton = new javax.swing.JButton();
+        eDateButton = new javax.swing.JButton();
 
         tripTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -124,6 +154,31 @@ public class ViewTrips extends javax.swing.JPanel implements TableModelListener 
             }
         });
 
+        sortLabel.setText("Sort:");
+
+        orderDrop.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        tripButton.setText("Trip Name");
+        tripButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tripButtonActionPerformed(evt);
+            }
+        });
+
+        sDateButton.setText("Start Date");
+        sDateButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sDateButtonActionPerformed(evt);
+            }
+        });
+
+        eDateButton.setText("End Date");
+        eDateButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                eDateButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -136,13 +191,18 @@ public class ViewTrips extends javax.swing.JPanel implements TableModelListener 
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 523, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(512, 512, 512)
                         .addComponent(addTripsButton)
                         .addGap(26, 26, 26))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(delRowButton)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(delRowButton)
+                            .addComponent(sortLabel)
+                            .addComponent(orderDrop, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tripButton)
+                            .addComponent(sDateButton)
+                            .addComponent(eDateButton))))
                 .addContainerGap(173, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -156,7 +216,18 @@ public class ViewTrips extends javax.swing.JPanel implements TableModelListener 
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(addTripsButton))
-                    .addComponent(delRowButton))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(delRowButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(sortLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(orderDrop, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tripButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(sDateButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(eDateButton)))
                 .addContainerGap(48, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -175,12 +246,41 @@ public class ViewTrips extends javax.swing.JPanel implements TableModelListener 
         updateTable();
     }//GEN-LAST:event_delRowButtonActionPerformed
 
+    private void tripButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tripButtonActionPerformed
+        if (orderDrop.getSelectedIndex() == 0) {
+            sortTable(IA.sortTrips("trip_name", "asc"));
+        } else if (orderDrop.getSelectedIndex() == 1) {
+            sortTable(IA.sortTrips("trip_name", "desc"));
+        }
+    }//GEN-LAST:event_tripButtonActionPerformed
+
+    private void sDateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sDateButtonActionPerformed
+        if (orderDrop.getSelectedIndex() == 0) {
+            sortTable(IA.sortTrips("strt_date", "asc"));
+        } else if (orderDrop.getSelectedIndex() == 1) {
+            sortTable(IA.sortTrips("strt_date", "desc"));
+        }
+    }//GEN-LAST:event_sDateButtonActionPerformed
+
+    private void eDateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eDateButtonActionPerformed
+        if (orderDrop.getSelectedIndex() == 0) {
+            sortTable(IA.sortTrips("end_date", "asc"));
+        } else if (orderDrop.getSelectedIndex() == 1) {
+            sortTable(IA.sortTrips("end_date", "desc"));
+        }
+    }//GEN-LAST:event_eDateButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addTripsButton;
     private javax.swing.JButton delRowButton;
+    private javax.swing.JButton eDateButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JComboBox<String> orderDrop;
+    private javax.swing.JButton sDateButton;
+    private javax.swing.JLabel sortLabel;
+    private javax.swing.JButton tripButton;
     private javax.swing.JTable tripTable;
     // End of variables declaration//GEN-END:variables
 }

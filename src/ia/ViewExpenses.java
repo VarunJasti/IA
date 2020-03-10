@@ -28,7 +28,6 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
         int r = e.getFirstRow();
         int c = e.getColumn();
         IA.updateExps(expensesTable.getValueAt(r, 0), expensesTable.getValueAt(r, 1), expensesTable.getValueAt(r, 2), expensesTable.getValueAt(r, 3), expensesTable.getValueAt(r, 4), c);
-        System.out.println("changed");
     }
 
     public void updateTable() {
@@ -73,6 +72,7 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
         }catch (Exception e) {
             System.out.println("error");
         }
+        expensesTable.getModel().addTableModelListener(this);
     }
 
     /**
@@ -172,10 +172,25 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
         });
 
         typeButton.setText("Type");
+        typeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                typeButtonActionPerformed(evt);
+            }
+        });
 
         currButton.setText("Currency");
+        currButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                currButtonActionPerformed(evt);
+            }
+        });
 
         dateButton.setText("Date");
+        dateButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dateButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -264,6 +279,30 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
             sortTable(IA.sortExps("amount", "desc"));
         }
     }//GEN-LAST:event_amtButtonActionPerformed
+
+    private void typeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_typeButtonActionPerformed
+        if (orderDrop.getSelectedIndex() == 0) {
+            sortTable(IA.sortExps("expenseType", "asc"));
+        } else if (orderDrop.getSelectedIndex() == 1) {
+            sortTable(IA.sortExps("expenseType", "desc"));
+        }
+    }//GEN-LAST:event_typeButtonActionPerformed
+
+    private void currButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_currButtonActionPerformed
+        if (orderDrop.getSelectedIndex() == 0) {
+            sortTable(IA.sortExps("currency", "asc"));
+        } else if (orderDrop.getSelectedIndex() == 1) {
+            sortTable(IA.sortExps("currency", "desc"));
+        }
+    }//GEN-LAST:event_currButtonActionPerformed
+
+    private void dateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dateButtonActionPerformed
+        if (orderDrop.getSelectedIndex() == 0) {
+            sortTable(IA.sortExps("dates", "asc"));
+        } else if (orderDrop.getSelectedIndex() == 1) {
+            sortTable(IA.sortExps("dates", "desc"));
+        }
+    }//GEN-LAST:event_dateButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
