@@ -15,8 +15,67 @@ public class IA {
         base = new Base();
         base.setVisible(true);
     }
-    
-    public static ResultSet sortTrips (String type, String order) {
+
+    public static ResultSet adminExps(String user, String trip, String type) {
+        try {
+            Statement stmt = con.createStatement();
+            stmt.execute("select top 15 * from " + user + "_expenses where trip = '" + trip + "' and expenseType = '" + type + "';");
+            return stmt.getResultSet();
+        } catch (Exception e) {
+            System.out.println("error");
+        }
+        return null;
+    }
+
+    public static ResultSet getSummary(String user, String trip) {
+        try {
+            Statement stmt = con.createStatement();
+            stmt.execute("select * from " + user + "_expenses where trip = '" + trip + "';");
+            return stmt.getResultSet();
+        } catch (Exception e) {
+            System.out.println("error");
+        }
+        return null;
+    }
+
+    public static String user(String first, String last) {
+        try {
+            Statement stmt = con.createStatement();
+            stmt.execute("select username from users where first_name = '" + first + "' and last_name = '" + last + "';");
+            ResultSet rs = stmt.getResultSet();
+            rs.next();
+            return rs.getString("username");
+        } catch (Exception e) {
+            System.out.println("error");
+        }
+        return null;
+    }
+
+    public static ResultSet getUsers() {
+        try {
+            Statement stmt = con.createStatement();
+            stmt.execute("select top 15 * from users where admin_check = 0;");
+            return stmt.getResultSet();
+        } catch (Exception e) {
+            System.out.println("error");
+        }
+        return null;
+    }
+
+    public static ResultSet viewImg(Object trip, Object amount, Object type, Object curr, Object date, String user) {
+        if (trip instanceof String && amount instanceof String && type instanceof String && curr instanceof String && date instanceof String) {
+            try {
+                Statement stmt = con.createStatement();
+                stmt.execute("select top 1 images from " + user + "_expenses where trip = '" + trip + "' and amount = " + amount + " and expenseType = '" + type + "' and currency = '" + curr + "' and dates = '" + date + "';");
+                return stmt.getResultSet();
+            } catch (Exception e) {
+                System.out.println("error");
+            }
+        }
+        return null;
+    }
+
+    public static ResultSet sortTrips(String type, String order) {
         try {
             Statement stmt = con.createStatement();
             stmt.execute("select top 15 * from " + base.getUser() + "_trips order by " + type + " " + order + ";");
@@ -26,9 +85,8 @@ public class IA {
         }
         return null;
     }
-    
-    public static ResultSet sortExps(String type, String order)
-    {
+
+    public static ResultSet sortExps(String type, String order) {
         try {
             Statement stmt = con.createStatement();
             stmt.execute("select top 15 * from " + base.getUser() + "_expenses order by " + type + " " + order + ";");
@@ -108,6 +166,7 @@ public class IA {
             return stmt.getResultSet();
         } catch (Exception e) {
             System.out.println("error");
+            e.printStackTrace();
         }
         return null;
     }
@@ -183,17 +242,16 @@ public class IA {
         }
         if ((trip instanceof String && type instanceof String && curr instanceof String)) {
             try {
-                PreparedStatement pstmt = con.prepareStatement("insert into " + base.getUser() + "_expenses(trip, amount, expenseType, currency, dates, images) values('" + trip + "', " + amt + ", '" + type + "', '" + curr + "', '" + date + "', ?)");
-                /*pstmt.setString(1, (String)trip);
-                pstmt.setString(2, (String)type);
-                pstmt.setString(3, (String)curr);
-                pstmt.setDouble(a, amt);
-                pstmt.setString(5, (String)date);*/
-                pstmt.setBinaryStream(1, fis, len);
-                pstmt.executeUpdate();
-                //Statement stmt = con.createStatement();
-                //stmt.executeUpdate("insert into " + base.getUser() + "_expenses(trip, amount, expenseType, currency, dates, images) values('" + trip + "', " + amt + ", '" + type + "', '" + curr + "', '" + date + "',);");
-                return true;
+                if (fis == null) {
+                    Statement stmt = con.createStatement();
+                    stmt.executeUpdate("insert into " + base.getUser() + "_expenses(trip, amount, expenseType, currency, dates, images) values('" + trip + "', " + amt + ", '" + type + "', '" + curr + "', '" + date + "', null);");
+                    return true;
+                } else {
+                    PreparedStatement pstmt = con.prepareStatement("insert into " + base.getUser() + "_expenses(trip, amount, expenseType, currency, dates, images) values('" + trip + "', " + amt + ", '" + type + "', '" + curr + "', '" + date + "', ?)");
+                    pstmt.setBinaryStream(1, fis, len);
+                    pstmt.executeUpdate();
+                    return true;
+                }
             } catch (Exception e) {
                 System.out.println("error");
                 e.printStackTrace();
@@ -216,13 +274,15 @@ public class IA {
         return null;
     }
 
-    public static void addUser(String user, String pass, String firstName, String lastName) {
+    public static void addUser(String user, String pass, String firstName, String lastName, int admin) {
         try {
             Statement stmt = con.createStatement();
-            stmt.executeUpdate("insert into users(username, pass, first_name, last_name) values ('" + user + "', '" + pass + "', '" + firstName + "', '" + lastName + "');");
-            stmt.executeUpdate("create table " + user + "_expenses (trip varchar(30), amount decimal(18, 2), expenseType varchar(30), currency varchar(5), dates date, images varbinary(MAX));");
-            stmt.executeUpdate("create table " + user + "_trips (trip_name varchar(30), strt_date date, end_date date);");
-            IA.base.showPanel(2);
+            stmt.executeUpdate("insert into users(username, pass, first_name, last_name, admin_check) values ('" + user + "', '" + pass + "', '" + firstName + "', '" + lastName + "', " + admin + ");");
+            if (admin == 0) {
+                stmt.executeUpdate("create table " + user + "_expenses (trip varchar(30), amount decimal(18, 2), expenseType varchar(30), currency varchar(5), dates date, images varbinary(MAX));");
+                stmt.executeUpdate("create table " + user + "_trips (trip_name varchar(30), strt_date date, end_date date);");
+            }
+            base.showPanel(2);
         } catch (Exception e) {
             System.out.println("error");
             e.printStackTrace();
@@ -276,6 +336,21 @@ public class IA {
             //e.printStackTrace();
         }
         return "";
+    }
+
+    public static boolean checkAdmin(String user) {
+        try {
+            Statement stmt = con.createStatement();
+            stmt.execute("select admin_check from users where username = '" + user + "';");
+            ResultSet rs = stmt.getResultSet();
+            rs.next();
+            if (rs.getInt("admin_check") == 1) {
+                return true;
+            }
+        } catch (Exception e) {
+            System.out.println("error");
+        }
+        return false;
     }
 
     public static boolean checkUser(String user, String pass) {

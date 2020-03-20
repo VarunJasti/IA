@@ -14,10 +14,14 @@ public class Login extends JPanel {
     public Login() {
         initComponents();
     }
-    
+
     public void user() {
         if (IA.checkUser(userField.getText(), passField.getText())) {
-            IA.base.showPanel(3);
+            if (IA.checkAdmin(userField.getText())) {
+                IA.base.showPanel(7);
+            } else {
+                IA.base.showPanel(3);
+            }
             IA.base.setUser(userField.getText());
         } else {
             JDialog fail = new LoginFailed(IA.base, true);

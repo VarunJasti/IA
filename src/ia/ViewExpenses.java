@@ -1,9 +1,21 @@
 package ia;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.sql.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import javax.imageio.ImageIO;
+import static javax.management.Query.gt;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileSystemView;
 
@@ -100,6 +112,7 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
         typeButton = new javax.swing.JButton();
         currButton = new javax.swing.JButton();
         dateButton = new javax.swing.JButton();
+        viewImgButton = new javax.swing.JButton();
 
         expensesTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -196,15 +209,19 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
             }
         });
 
+        viewImgButton.setText("View Image");
+        viewImgButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                viewImgButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap(556, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(addExpButton))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(77, 77, 77)
                         .addComponent(expensesLabel))
@@ -220,8 +237,12 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
                             .addComponent(amtButton)
                             .addComponent(typeButton)
                             .addComponent(currButton)
-                            .addComponent(dateButton))))
-                .addContainerGap(64, Short.MAX_VALUE))
+                            .addComponent(dateButton)
+                            .addComponent(viewImgButton)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap(556, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(addExpButton)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -229,14 +250,12 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
                 .addGap(37, 37, 37)
                 .addComponent(expensesLabel)
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(27, 27, 27)
-                        .addComponent(addExpButton))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(delExpButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(viewImgButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(sortLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(orderDrop, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -249,7 +268,10 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(currButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(dateButton)))
+                        .addComponent(dateButton))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(27, 27, 27)
+                .addComponent(addExpButton)
                 .addContainerGap(49, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -308,6 +330,27 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
         }
     }//GEN-LAST:event_dateButtonActionPerformed
 
+    private void viewImgButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewImgButtonActionPerformed
+        int r = expensesTable.getSelectedRow();
+        ResultSet rs = IA.viewImg(expensesTable.getValueAt(r, 0), expensesTable.getValueAt(r, 1), expensesTable.getValueAt(r, 2), expensesTable.getValueAt(r, 3), expensesTable.getValueAt(r, 4), IA.base.getUser());
+        try {
+            rs.next();
+            if (rs.getString("images") == null) {
+                ViewImg frame = new ViewImg();
+                frame.setVisible(true);
+            } else {
+                Blob blob = rs.getBlob("images");
+                InputStream in = blob.getBinaryStream();
+                BufferedImage img = ImageIO.read(rs.getBinaryStream("images"));
+                ViewImg frame = new ViewImg(img);
+                frame.setVisible(true);
+            }
+        } catch (Exception e) {
+            System.out.println("error");
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_viewImgButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addExpButton;
@@ -322,5 +365,6 @@ public class ViewExpenses extends javax.swing.JPanel implements TableModelListen
     private javax.swing.JLabel sortLabel;
     private javax.swing.JButton tripButton;
     private javax.swing.JButton typeButton;
+    private javax.swing.JButton viewImgButton;
     // End of variables declaration//GEN-END:variables
 }

@@ -14,39 +14,75 @@ import java.util.*;
  * @author Varun Jasti
  */
 public class Base extends javax.swing.JFrame {
-    
+
     private static ArrayList<JPanel> pList = new ArrayList<>();
     private static String user;
     private static Expenses exp;
     private static ViewExpenses viewExps;
     private static ViewTrips viewTrips;
-    
+    private static Admin admin;
+    private static AdminTrips adminTrips;
+    private static AdminExpenseSummary summary;
+    private static ViewTripExpenses adminExps;
+
     public Base() {
         initComponents();
         loadJPanels();
         showPanel(2);
     }
-    
+
     public void setUser(String user) {
         this.user = user;
         exp.trips();
     }
-    
+
     public String getUser() {
         return user;
     }
-    
-    public void showPanel(int pNum)
-    {
+
+    public AdminTrips getAdminTrips() {
+        return adminTrips;
+    }
+
+    public AdminExpenseSummary getSummary() {
+        return summary;
+    }
+
+    public ViewTripExpenses getAdminExps() {
+        return adminExps;
+    }
+
+    public void showPanel(int pNum) {
         for (int i = 0; i < pList.size(); i++) {
             pList.get(i).setVisible(false);
         }
-        if (pNum == 3) exp.trips();
-        if (pNum == 5) viewExps.updateTable();
-        if (pNum == 6) viewTrips.updateTable();
+        if (pNum == 3) {
+            exp.trips();
+        }
+        if (pNum == 5) {
+            viewExps.updateTable();
+        }
+        if (pNum == 6) {
+            viewTrips.updateTable();
+        }
+        if (pNum == 7) {
+            admin.loadTable(IA.getUsers());
+        }
+        if (pNum == 8) {
+            adminTrips.loadTable();
+            adminTrips.loadLabel();
+        }
+        if (pNum == 9) {
+            summary.loadTable();
+            summary.setLabel();
+        }
+        if (pNum == 10) {
+            adminExps.setLabel();
+            adminExps.setTable();
+        }
         pList.get(pNum - 1).setVisible(true);
     }
-    
+
     public void loadJPanels() {
         JPanel user = new NewUser();
         JPanel login = new Login();
@@ -54,19 +90,24 @@ public class Base extends javax.swing.JFrame {
         JPanel trip = new Trip();
         viewExps = new ViewExpenses();
         viewTrips = new ViewTrips();
-        this.add(user);
-        this.add(login);
-        this.add(exp);
-        this.add(trip);
-        this.add(viewExps);
-        this.add(viewTrips);
+        admin = new Admin();
+        adminTrips = new AdminTrips();
+        summary = new AdminExpenseSummary();
+        adminExps = new ViewTripExpenses();
+        NewAdmin newAdmin = new NewAdmin();
         pList.add(user);
         pList.add(login);
         pList.add(exp);
         pList.add(trip);
         pList.add(viewExps);
         pList.add(viewTrips);
+        pList.add(admin);
+        pList.add(adminTrips);
+        pList.add(summary);
+        pList.add(adminExps);
+        pList.add(newAdmin);
         for (int i = 0; i < pList.size(); i++) {
+            this.add(pList.get(i));
             pList.get(i).setLocation(0, 0);
             pList.get(i).setSize(this.getContentPane().getWidth(), this.getContentPane().getHeight());
             pList.get(i).setVisible(true);

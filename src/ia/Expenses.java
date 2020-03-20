@@ -67,14 +67,28 @@ public class Expenses extends javax.swing.JPanel {
         tripDrop.setSelectedIndex(-1);
     }
 
+    public void empty() {
+        amountField.setText("");
+        tripDrop.setSelectedIndex(-1);
+        typeDrop.setSelectedIndex(-1);
+        currDrop.setSelectedIndex(-1);
+        selFileButton.setText("Select File");
+        SF = null;
+    }
+
     public void expense() {
         try {
-            FileInputStream fis = new FileInputStream(SF);
-            if (IA.addExpense(tripDrop.getSelectedItem(), typeDrop.getSelectedItem(), currDrop.getSelectedItem(), amountField.getText(), year.getSelectedItem() + "-" + month.getSelectedItem() + "-" + day.getSelectedItem(), fis, (int)SF.length())) {
-                amountField.setText("");
-                tripDrop.setSelectedIndex(-1);
-                typeDrop.setSelectedIndex(-1);
-                currDrop.setSelectedIndex(-1);
+            if (!(SF == null)) {
+                FileInputStream fis = new FileInputStream(SF);
+                if (IA.addExpense(tripDrop.getSelectedItem(), typeDrop.getSelectedItem(), currDrop.getSelectedItem(), amountField.getText(), year.getSelectedItem() + "-" + month.getSelectedItem() + "-" + day.getSelectedItem(), fis, (int) SF.length())) {
+                    empty();
+                } else {
+                    System.out.println("failed");
+                }
+            } else {
+                if (IA.addExpense(tripDrop.getSelectedItem(), typeDrop.getSelectedItem(), currDrop.getSelectedItem(), amountField.getText(), year.getSelectedItem() + "-" + month.getSelectedItem() + "-" + day.getSelectedItem(), null, 0)) {
+                    empty();
+                }
             }
         } catch (Exception e) {
             System.out.println("error");

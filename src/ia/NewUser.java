@@ -23,7 +23,7 @@ public class NewUser extends JPanel {
     
     public void newUser()
     {
-        IA.addUser(usernameField.getText(), passField.getText(), firstNameField.getText(), lastNameField.getText());
+        IA.addUser(usernameField.getText(), passField.getText(), firstNameField.getText(), lastNameField.getText(), 0);
     }
     
     /*public void addUser() {
