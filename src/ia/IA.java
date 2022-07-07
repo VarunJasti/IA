@@ -6,7 +6,7 @@ import javax.swing.*;
 
 public class IA {
 
-    private static String url = "jdbc:sqlserver://csia.database.windows.net:1433;database=IATests;user=jastvar21@csia;password=1894982ISD!;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;";
+    private static String url = ""; //URL to connect to Azure hosted SQL database
     private static Connection con;
     public static Base base;
 
